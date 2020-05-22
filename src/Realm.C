@@ -1930,12 +1930,14 @@ Realm::pre_timestep_work()
     if ( hasOverset_ )
       initialize_overset();
 
-    // Reset the ngp::Mesh instance
-    meshInfo_.reset(new typename Realm::NgpMeshInfo(*bulkData_));
+    if (hasNonConformal_ ||
+        (hasOverset_ && !equationSystems_.all_systems_decoupled())) {
+      // Reset the stk::mesh::NgpMesh instance
+      meshInfo_.reset(new typename Realm::NgpMeshInfo(*bulkData_));
 
-    // now re-initialize linear system
-    equationSystems_.reinitialize_linear_system();
-
+      // now re-initialize linear system
+      equationSystems_.reinitialize_linear_system();
+    }
   }
 
   // deal with non-topology changes, however, moving mesh
