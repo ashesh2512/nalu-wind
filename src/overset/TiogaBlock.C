@@ -148,7 +148,7 @@ void TiogaBlock::update_coords()
       }
 
       double* nVol = stk::mesh::field_data(*nodeVol, node);
-      node_res_[ip] = *nVol;
+      node_res_[ip] = meshtag_;
       ip++;
     }
   }
@@ -191,7 +191,7 @@ TiogaBlock::update_element_volumes()
     int ep = elem_offsets[npe];
 
     for (size_t ie=0; ie < b->size(); ++ie)
-      cell_res_[ep++] = eVol[ie];
+      cell_res_[ep++] = meshtag_;
 
     elem_offsets[npe] = ep;
   }
@@ -371,7 +371,7 @@ void TiogaBlock::process_nodes()
         xyz_[ip * ndim_ + i] = pt[i];
       }
 
-      node_res_[ip] = *nVol;
+      node_res_[ip] = meshtag_;
       node_map_[nid] = ip + 1; // TIOGA uses 1-based indexing
       nodeid_map_[ip] = nid;
       ip++;
