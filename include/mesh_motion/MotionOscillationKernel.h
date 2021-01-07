@@ -1,5 +1,5 @@
-#ifndef MOTIONPULSATINGSPHERE_H
-#define MOTIONPULSATINGSPHERE_H
+#ifndef MOTIONOSCILLATION_H
+#define MOTIONOSCILLATION_H
 
 #include "NgpMotion.h"
 
@@ -8,18 +8,18 @@ namespace YAML { class Node; }
 namespace sierra{
 namespace nalu{
 
-class MotionPulsatingSphereKernel : public NgpMotionKernel<MotionPulsatingSphereKernel>
+class MotionOscillationKernel : public NgpMotionKernel<MotionOscillationKernel>
 {
 public:
-  MotionPulsatingSphereKernel(
+  MotionOscillationKernel(
     stk::mesh::MetaData&,
     const YAML::Node&);
 
   KOKKOS_FUNCTION
-  MotionPulsatingSphereKernel() = default;
+  MotionOscillationKernel() = default;
 
   KOKKOS_FUNCTION
-  virtual ~MotionPulsatingSphereKernel() = default;
+  virtual ~MotionOscillationKernel() = default;
 
   /** Function to compute motion-specific transformation matrix
    *
@@ -51,11 +51,11 @@ public:
 private:
   void load(const YAML::Node&);
 
-  double amplitude_{0.0};
-  double frequency_{0.0};
+  mm::ThreeDVecType amplitude_;
+  mm::ThreeDVecType frequency_;
 };
 
 } // nalu
 } // sierra
 
-#endif /* MOTIONPULSATINGSPHERE_H */
+#endif /* MOTIONOSCILLATION_H */

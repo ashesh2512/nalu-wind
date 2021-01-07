@@ -9,8 +9,8 @@ target_sources(nalu PRIVATE
    ${CMAKE_CURRENT_SOURCE_DIR}/MeshDisplacementEquationSystem.C
    ${CMAKE_CURRENT_SOURCE_DIR}/MeshDisplacementMassBackwardEulerNodeSuppAlg.C
    ${CMAKE_CURRENT_SOURCE_DIR}/MeshMotionAlg.C
+   ${CMAKE_CURRENT_SOURCE_DIR}/MotionOscillationKernel.C
    ${CMAKE_CURRENT_SOURCE_DIR}/MeshTransformationAlg.C
-   ${CMAKE_CURRENT_SOURCE_DIR}/MotionPulsatingSphereKernel.C
    ${CMAKE_CURRENT_SOURCE_DIR}/MotionRotationKernel.C
    ${CMAKE_CURRENT_SOURCE_DIR}/MotionScalingKernel.C
    ${CMAKE_CURRENT_SOURCE_DIR}/MotionTranslationKernel.C

@@ -1,7 +1,7 @@
 #include "mesh_motion/FrameBase.h"
 
 #include "FieldTypeDef.h"
-#include "mesh_motion/MotionPulsatingSphereKernel.h"
+#include "mesh_motion/MotionOscillationKernel.h"
 #include "mesh_motion/MotionScalingKernel.h"
 #include "mesh_motion/MotionRotationKernel.h"
 #include "mesh_motion/MotionTranslationKernel.h"
@@ -60,8 +60,8 @@ void FrameBase::load(const YAML::Node& node)
     get_required(motion_def, "type", type);
 
     // determine type of mesh motion based on user definition in input file
-    if (type == "pulsating_sphere")
-      motionKernels_[i].reset(new MotionPulsatingSphereKernel(meta_,motion_def));
+    if (type == "oscillation")
+      motionKernels_[i].reset(new MotionOscillationKernel(meta_,motion_def));
     else if (type == "rotation")
       motionKernels_[i].reset(new MotionRotationKernel(motion_def));
     else if (type == "scaling")
