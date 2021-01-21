@@ -31,6 +31,8 @@ target_sources(nalu PRIVATE
    ${CMAKE_CURRENT_SOURCE_DIR}/SteadyThermalContactAuxFunction.C
    ${CMAKE_CURRENT_SOURCE_DIR}/SteadyThermalContactSrcElemSuppAlg.C
    ${CMAKE_CURRENT_SOURCE_DIR}/SteadyThermalContactSrcNodeSuppAlg.C
+   ${CMAKE_CURRENT_SOURCE_DIR}/StokesOscillatingSpherePressureAuxFunction.C
+   ${CMAKE_CURRENT_SOURCE_DIR}/StokesOscillatingSphereVelocityAuxFunction.C
    ${CMAKE_CURRENT_SOURCE_DIR}/TaylorGreenPressureAuxFunction.C
    ${CMAKE_CURRENT_SOURCE_DIR}/TaylorGreenVelocityAuxFunction.C
    ${CMAKE_CURRENT_SOURCE_DIR}/TornadoAuxFunction.C

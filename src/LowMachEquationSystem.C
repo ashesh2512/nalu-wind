@@ -166,6 +166,9 @@
 #include <user_functions/ConvectingTaylorVortexPressureAuxFunction.h>
 #include <user_functions/TornadoAuxFunction.h>
 
+#include <user_functions/StokesOscillatingSpherePressureAuxFunction.h>
+#include <user_functions/StokesOscillatingSphereVelocityAuxFunction.h>
+
 #include <user_functions/WindEnergyTaylorVortexAuxFunction.h>
 #include <user_functions/WindEnergyTaylorVortexPressureAuxFunction.h>
 
@@ -656,6 +659,9 @@ LowMachEquationSystem::register_initial_condition_fcn(
     }
     else if ( fcnName == "convecting_taylor_vortex" ) {
       theAuxFunc = new ConvectingTaylorVortexVelocityAuxFunction(0,nDim);
+    }
+    else if ( fcnName == "stokes_oscillating_sphere" ) {
+      theAuxFunc = new StokesOscillatingSphereVelocityAuxFunction(0,nDim);
     }
     else if ( fcnName == "TaylorGreen"  ) {
       theAuxFunc = new TaylorGreenVelocityAuxFunction(0,nDim);
@@ -1672,6 +1678,9 @@ MomentumEquationSystem::register_inflow_bc(
     if ( fcnName == "convecting_taylor_vortex" ) {
       theAuxFunc = new ConvectingTaylorVortexVelocityAuxFunction(0,nDim);
     }
+    else if ( fcnName == "stokes_oscillating_sphere" ) {
+      theAuxFunc = new StokesOscillatingSphereVelocityAuxFunction(0,nDim);
+    }
     else if ( fcnName == "SteadyTaylorVortex" ) {
       theAuxFunc = new SteadyTaylorVortexVelocityAuxFunction(0,nDim);
     }
@@ -1908,7 +1917,6 @@ MomentumEquationSystem::register_wall_bc(
 
     bcDataAlg_.push_back(wallVelCopyAlg);
   }
-
   // if mesh motion is not enabled...
   else {
     // extract the value for user specified velocity and save off the AuxFunction
@@ -3173,6 +3181,9 @@ ContinuityEquationSystem::register_inflow_bc(
       if ( fcnName == "convecting_taylor_vortex" ) {
         theAuxFunc = new ConvectingTaylorVortexVelocityAuxFunction(0,nDim);
       }
+      else if ( fcnName == "stokes_oscillating_sphere" ) {
+        theAuxFunc = new StokesOscillatingSphereVelocityAuxFunction(0,nDim);
+      }
       else if ( fcnName == "SteadyTaylorVortex" ) {
         theAuxFunc = new SteadyTaylorVortexVelocityAuxFunction(0,nDim);
       }
@@ -3729,6 +3740,9 @@ ContinuityEquationSystem::register_initial_condition_fcn(
     if ( fcnName == "convecting_taylor_vortex" ) {
       // create the function
       theAuxFunc = new ConvectingTaylorVortexPressureAuxFunction();
+    }
+    else if ( fcnName == "stokes_oscillating_sphere" ) {
+      theAuxFunc = new StokesOscillatingSpherePressureAuxFunction();
     }
     else if ( fcnName == "wind_energy_taylor_vortex") {
       // extract the params

@@ -23,6 +23,8 @@
 #include <user_functions/SteadyTaylorVortexGradPressureAuxFunction.h>
 #include <user_functions/ConvectingTaylorVortexVelocityAuxFunction.h>
 #include <user_functions/ConvectingTaylorVortexPressureAuxFunction.h>
+#include <user_functions/StokesOscillatingSpherePressureAuxFunction.h>
+#include <user_functions/StokesOscillatingSphereVelocityAuxFunction.h>
 #include <user_functions/VariableDensityVelocityAuxFunction.h>
 #include <user_functions/VariableDensityNonIsoTemperatureAuxFunction.h>
 #include <user_functions/BoussinesqNonIsoVelocityAuxFunction.h>
@@ -269,6 +271,12 @@ SolutionNormPostProcessing::analytical_function_factory(
   }
   else if ( functionName == "convecting_taylor_vortex_dpdx" ) {
     theAuxFunc = new ConvectingTaylorVortexPressureGradAuxFunction(0,realm_.meta_data().spatial_dimension());
+  }
+  else if ( functionName == "stokes_oscillating_sphere" ) {
+    theAuxFunc = new StokesOscillatingSphereVelocityAuxFunction(0,realm_.meta_data().spatial_dimension());
+  }
+  else if ( functionName == "stokes_oscillating_sphere_dpdx" ) {
+    theAuxFunc = new StokesOscillatingSpherePressureGradAuxFunction(0,realm_.meta_data().spatial_dimension());
   }
   else if ( functionName == "OneTwoTenVelocity" ) {
     theAuxFunc = new OneTwoTenVelocityAuxFunction(0,realm_.meta_data().spatial_dimension());
