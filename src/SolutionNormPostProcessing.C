@@ -328,6 +328,9 @@ SolutionNormPostProcessing::execute()
   for ( size_t k = 0; k < populateExactNodalFieldAlg_.size(); ++k )
     populateExactNodalFieldAlg_[k]->execute();
   
+  // get iblank
+  ScalarIntFieldType *ibNode = metaData.get_field<ScalarIntFieldType>(stk::topology::NODE_RANK, "iblank");
+
   stk::mesh::Selector s_locall_owned
     = metaData.locally_owned_part() 
     & stk::mesh::selectUnion(partVec_) 
@@ -359,6 +362,7 @@ SolutionNormPostProcessing::execute()
       // extract fields
       const double *dofField = (double*)stk::mesh::field_data(*(fieldPairVec_[j].first), b);
       double *exactDofField = (double*)stk::mesh::field_data(*(fieldPairVec_[j].second), b);
+      int *ib = stk::mesh::field_data(*ibNode, b);
 
       // size of this particular field      
       const int fieldSize = sizeOfEachField_[j];
@@ -372,10 +376,12 @@ SolutionNormPostProcessing::execute()
         // loop over each field component
         for ( int i = 0; i < fieldSize; ++i ) {
           const double diff = std::abs(dofField[k*fieldSize+i] - exactDofField[k*fieldSize+i]);
+
+          // FIXME: assumes that iblank field exists
           // norms...
-          Loo[i] = std::max(diff, Loo[i]);
-          L1[i] += diff;
-          L2[i] += diff*diff;
+          Loo[i] = std::max(diff, Loo[i]) * std::max(ib[k],0);
+          L1[i] += diff * std::max(ib[k],0);
+          L2[i] += diff*diff * std::max(ib[k],0);
         }
       }
       // increment offset

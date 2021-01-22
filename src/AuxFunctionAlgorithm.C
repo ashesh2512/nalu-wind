@@ -46,7 +46,6 @@ AuxFunctionAlgorithm::~AuxFunctionAlgorithm() {
 void
 AuxFunctionAlgorithm::execute()
 {
-
   // make sure that partVec_ is size one
   ThrowAssert( partVec_.size() == 1 );
 
@@ -55,9 +54,12 @@ AuxFunctionAlgorithm::execute()
   const unsigned nDim = meta_data.spatial_dimension();
   const double time = realm_.get_current_time();
   VectorFieldType *coordinates = meta_data.get_field<VectorFieldType>(stk::topology::NODE_RANK, realm_.get_coordinates_name());
+  ScalarIntFieldType *ibNode = meta_data.get_field<ScalarIntFieldType>(stk::topology::NODE_RANK, "iblank");
 
   auxFunction_->setup(time);
 
+  // sync data to host
+  ibNode->sync_to_host();
   field_->sync_to_host();
   stk::mesh::Selector selector = stk::mesh::selectUnion(partVec_) &
     stk::mesh::selectField(*field_);
@@ -70,7 +72,7 @@ AuxFunctionAlgorithm::execute()
     stk::mesh::Bucket & b = **ib ;
     const unsigned fieldSize = field_bytes_per_entity(*field_, b) / sizeof(double);
 
-    const stk::mesh::Bucket::size_type length   = b.size();
+    const stk::mesh::Bucket::size_type length = b.size();
 
     // FIXME: because coordinates are only defined at nodes, this actually
     //        only works for nodal fields. Hrmmm.
@@ -78,6 +80,18 @@ AuxFunctionAlgorithm::execute()
     double * fieldData = (double*) stk::mesh::field_data( *field_, *b.begin() );
 
     auxFunction_->evaluate(coords, time, nDim, length, fieldData, fieldSize);
+
+    // FIXME: assumes that iblank field exists
+    // mask all solution that is evaluated on a hole point
+    for(size_t in=0; in<length; ++in) {
+      // extract fields
+      auto node = (b)[in];
+      int* ib = stk::mesh::field_data(*ibNode, node);
+      double* fld = (double*) stk::mesh::field_data(*field_, node);
+
+      for( size_t i=0; i<fieldSize; ++i )
+        fld[i] = fld[i] * std::max(std::abs(ib[0]),0);
+    }
   }
 
   field_->modify_on_host();
