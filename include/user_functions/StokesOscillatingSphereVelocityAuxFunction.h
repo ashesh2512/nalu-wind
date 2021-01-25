@@ -44,6 +44,7 @@ private:
   double pi_{0.0};
   double r0_{0.0};
   double visc_{0.0};
+  double eps_{1e-8};
 
   std::complex<double> lam_{0.0,0.0};
   std::complex<double> B_{0.0,0.0};

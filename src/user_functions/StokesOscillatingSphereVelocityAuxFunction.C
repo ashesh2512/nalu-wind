@@ -62,6 +62,17 @@ StokesOscillatingSphereVelocityAuxFunction::do_evaluate(
     double y = coords[1] - cenY;
     double z = coords[2] - cenZ;
     double dist = std::sqrt(std::pow(x,2)+std::pow(y,2)+std::pow(z,2));
+    
+    // solution does not exist inside sphere
+    if(dist < r0_-eps_) {
+      fieldPtr[0] = 0.0;
+      fieldPtr[1] = 0.0;
+      fieldPtr[2] = 0.0;
+      
+      fieldPtr += fieldSize;
+      coords += fieldSize;
+      continue;
+    }
 
     // dimensionless distance metrics
     std::complex<double> R = lam_*dist/r0_;
@@ -71,23 +82,23 @@ StokesOscillatingSphereVelocityAuxFunction::do_evaluate(
     double vDotx = vCoeff_[0]*x+vCoeff_[1]*y+vCoeff_[2]*z;
 
     // different components of 1st term
-    std::vector<std::complex<double>> B1 {(2.*expR*(1.+1./R+1./R2) - 2./R2)*vCoeff_[0]/dist,
-                                          (2.*expR*(1.+1./R+1./R2) - 2./R2)*vCoeff_[1]/dist,
-                                          (2.*expR*(1.+1./R+1./R2) - 2./R2)*vCoeff_[2]/dist};
-    std::vector<std::complex<double>> B2 {(6./R2 - 2.*expR*(1.+3./R+3./R2))*vDotx*x/std::pow(dist,3.),
-                                          (6./R2 - 2.*expR*(1.+3./R+3./R2))*vDotx*y/std::pow(dist,3.),
-                                          (6./R2 - 2.*expR*(1.+3./R+3./R2))*vDotx*z/std::pow(dist,3.)};
+    std::vector<std::complex<double>> B1 {(2.*expR*(1.+1./R+1./R2) - 2./R2)*vCoeff_[0]/(dist+eps_),
+                                          (2.*expR*(1.+1./R+1./R2) - 2./R2)*vCoeff_[1]/(dist+eps_),
+                                          (2.*expR*(1.+1./R+1./R2) - 2./R2)*vCoeff_[2]/(dist+eps_)};
+    std::vector<std::complex<double>> B2 {(6./R2 - 2.*expR*(1.+3./R+3./R2))*vDotx*x/(std::pow(dist,3.)+eps_),
+                                          (6./R2 - 2.*expR*(1.+3./R+3./R2))*vDotx*y/(std::pow(dist,3.)+eps_),
+                                          (6./R2 - 2.*expR*(1.+3./R+3./R2))*vDotx*z/(std::pow(dist,3.)+eps_)};
     std::vector<std::complex<double>> T1 {BCoeff*(B1[0] + B2[0]),
                                           BCoeff*(B1[1] + B2[1]),
                                           BCoeff*(B1[2] + B2[2])};
 
     // different components of 2nd term
-    std::vector<std::complex<double>> Q1 {-expR*(1.+R+R2)*vCoeff_[0]/std::pow(dist,3.),
-                                          -expR*(1.+R+R2)*vCoeff_[1]/std::pow(dist,3.),
-                                          -expR*(1.+R+R2)*vCoeff_[2]/std::pow(dist,3.)};
-    std::vector<std::complex<double>> Q2 {3.*expR*(1.+R+R2/3.)*vDotx*x/std::pow(dist,5.),
-                                          3.*expR*(1.+R+R2/3.)*vDotx*y/std::pow(dist,5.),
-                                          3.*expR*(1.+R+R2/3.)*vDotx*z/std::pow(dist,5.)};
+    std::vector<std::complex<double>> Q1 {-expR*(1.+R+R2)*vCoeff_[0]/(std::pow(dist,3.)+eps_),
+                                          -expR*(1.+R+R2)*vCoeff_[1]/(std::pow(dist,3.)+eps_),
+                                          -expR*(1.+R+R2)*vCoeff_[2]/(std::pow(dist,3.)+eps_)};
+    std::vector<std::complex<double>> Q2 {3.*expR*(1.+R+R2/3.)*vDotx*x/(std::pow(dist,5.)+eps_),
+                                          3.*expR*(1.+R+R2/3.)*vDotx*y/(std::pow(dist,5.)+eps_),
+                                          3.*expR*(1.+R+R2/3.)*vDotx*z/(std::pow(dist,5.)+eps_)};
     std::vector<std::complex<double>> T2 {QCoeff*(Q1[0] + Q2[0]),
                                           QCoeff*(Q1[1] + Q2[1]),
                                           QCoeff*(Q1[2] + Q2[2])};

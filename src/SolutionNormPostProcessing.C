@@ -353,8 +353,6 @@ SolutionNormPostProcessing::execute()
         ib != node_buckets.end() ; ++ib ) {
     stk::mesh::Bucket & b = **ib ;
     const stk::mesh::Bucket::size_type length   = b.size();
-
-    l_nodeCount += length;
     
     int offSet = 0;
     for ( size_t j = 0; j < fieldPairVec_.size(); ++j ) {
@@ -373,21 +371,28 @@ SolutionNormPostProcessing::execute()
       double *L2 = &l_L12Norm[offSet+totalDofCompSize_];
 
       for ( stk::mesh::Bucket::size_type k = 0 ; k < length ; ++k ) {
+
+        // FIXME: assumes that iblank field exists
+        if(ib[k] < 0.5) // calculate error norms only for field points
+          continue;
+        else
+          l_nodeCount += 1;
+
         // loop over each field component
         for ( int i = 0; i < fieldSize; ++i ) {
           const double diff = std::abs(dofField[k*fieldSize+i] - exactDofField[k*fieldSize+i]);
 
-          // FIXME: assumes that iblank field exists
           // norms...
-          Loo[i] = std::max(diff, Loo[i]) * std::max(ib[k],0);
-          L1[i] += diff * std::max(ib[k],0);
-          L2[i] += diff*diff * std::max(ib[k],0);
+          Loo[i] = std::max(diff, Loo[i]);
+          L1[i] += diff;
+          L2[i] += diff*diff;
         }
       }
       // increment offset
       offSet += fieldSize;
     }
   }
+  l_nodeCount = l_nodeCount/fieldPairVec_.size();
 
   // now assemble
   std::vector<double> g_LooNorm(totalDofCompSize_);

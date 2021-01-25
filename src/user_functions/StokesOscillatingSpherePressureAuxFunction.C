@@ -61,7 +61,16 @@ StokesOscillatingSpherePressureAuxFunction::do_evaluate(
 
     double vDotx = vCoeff_[0]*x+vCoeff_[1]*y+vCoeff_[2]*z;
 
-    fieldPtr[0] = std::real(PCoeff*vDotx/std::pow(dist,3.));
+    fieldPtr[0] = std::real(PCoeff*vDotx/(std::pow(dist,3.)+eps_));
+    
+    // solution does not exist inside sphere
+    if(dist < r0_-eps_) {
+      fieldPtr[0] = 0.0;
+      
+      fieldPtr += fieldSize;
+      coords += spatialDimension;
+      continue;
+    }
 
     fieldPtr += fieldSize;
     coords += spatialDimension;
@@ -88,7 +97,7 @@ void
 StokesOscillatingSpherePressureGradAuxFunction::do_evaluate(
   const double *coords,
   const double t,
-  const unsigned spatialDimension,
+  const unsigned /*spatialDimension*/,
   const unsigned numPoints,
   double * fieldPtr,
   const unsigned fieldSize,
@@ -110,15 +119,26 @@ StokesOscillatingSpherePressureGradAuxFunction::do_evaluate(
     double y = coords[1] - cenY;
     double z = coords[2] - cenZ;
     double dist = std::sqrt(std::pow(x,2)+std::pow(y,2)+std::pow(z,2));
+    
+    // solution does not exist inside sphere
+    if(dist < r0_-eps_) {
+      fieldPtr[0] = 0.0;
+      fieldPtr[1] = 0.0;
+      fieldPtr[2] = 0.0;
+      
+      fieldPtr += fieldSize;
+      coords += fieldSize;
+      continue;
+    }
 
     double vDotx = vCoeff_[0]*x+vCoeff_[1]*y+vCoeff_[2]*z;
 
-    fieldPtr[0] =  std::real(PCoeff*(vCoeff_[0]/std::pow(dist,3.) - 3.*vDotx*x/std::pow(dist,5.)));
-    fieldPtr[1] =  std::real(PCoeff*(vCoeff_[1]/std::pow(dist,3.) - 3.*vDotx*y/std::pow(dist,5.)));
-    fieldPtr[2] =  std::real(PCoeff*(vCoeff_[2]/std::pow(dist,3.) - 3.*vDotx*z/std::pow(dist,5.)));
+    fieldPtr[0] =  std::real(PCoeff*(vCoeff_[0]/(std::pow(dist,3.)+eps_) - 3.*vDotx*x/(std::pow(dist,5.)+eps_)));
+    fieldPtr[1] =  std::real(PCoeff*(vCoeff_[1]/(std::pow(dist,3.)+eps_) - 3.*vDotx*y/(std::pow(dist,5.)+eps_)));
+    fieldPtr[2] =  std::real(PCoeff*(vCoeff_[2]/(std::pow(dist,3.)+eps_) - 3.*vDotx*z/(std::pow(dist,5.)+eps_)));
 
     fieldPtr += fieldSize;
-    coords += spatialDimension;
+    coords += fieldSize;
   }
 }
 
