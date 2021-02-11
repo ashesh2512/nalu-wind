@@ -53,24 +53,24 @@ StokesOscillatingSpherePressureAuxFunction::do_evaluate(
                                 exp(std::complex<double>{0.,-1.}*omg_*t)*B_/(4.*pi_);
 
   for(unsigned p=0; p < numPoints; ++p) {
-    // get realtive position of point w.r.t. sphere center
+    // get relative position of point w.r.t. sphere center
     double x = coords[0] - cenX;
     double y = coords[1] - cenY;
     double z = coords[2] - cenZ;
     double dist = std::sqrt(std::pow(x,2)+std::pow(y,2)+std::pow(z,2));
 
-    double vDotx = vCoeff_[0]*x+vCoeff_[1]*y+vCoeff_[2]*z;
-
-    fieldPtr[0] = std::real(PCoeff*vDotx/(std::pow(dist,3.)+eps_));
-    
     // solution does not exist inside sphere
-    if(dist < r0_-eps_) {
+    if(dist < (r0_-eps_)) {
       fieldPtr[0] = 0.0;
-      
+
       fieldPtr += fieldSize;
       coords += spatialDimension;
       continue;
     }
+
+    double vDotx = vCoeff_[0]*x+vCoeff_[1]*y+vCoeff_[2]*z;
+
+    fieldPtr[0] = std::real(PCoeff*vDotx/(std::pow(dist,3.)+eps_));
 
     fieldPtr += fieldSize;
     coords += spatialDimension;
@@ -114,14 +114,14 @@ StokesOscillatingSpherePressureGradAuxFunction::do_evaluate(
                                 exp(std::complex<double>{0.,-1.}*omg_*t)*B_/(4.*pi_);
 
   for(unsigned p=0; p < numPoints; ++p) {
-    // get realtive position of point w.r.t. sphere center
+    // get relative position of point w.r.t. sphere center
     double x = coords[0] - cenX;
     double y = coords[1] - cenY;
     double z = coords[2] - cenZ;
     double dist = std::sqrt(std::pow(x,2)+std::pow(y,2)+std::pow(z,2));
     
     // solution does not exist inside sphere
-    if(dist < r0_-eps_) {
+    if(dist < (r0_-eps_)) {
       fieldPtr[0] = 0.0;
       fieldPtr[1] = 0.0;
       fieldPtr[2] = 0.0;
