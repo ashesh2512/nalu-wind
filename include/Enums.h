@@ -20,6 +20,7 @@ namespace nalu {
 
 enum AlgorithmType{
   INTERIOR  = 0,
+  INTERIOR2,
   BOUNDARY,
   INFLOW    ,
   WALL      ,
@@ -35,7 +36,6 @@ enum AlgorithmType{
   ELEM_SOURCE ,
   OVERSET ,
   WALL_ABL ,
-
   TOP_ABL,
 
   /** Set the reference pressure at a node.

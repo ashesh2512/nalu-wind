@@ -8,7 +8,7 @@
 //
 
 
-#include "edge_kernels/MomentumEdgeSolverAlg.h"
+#include "edge_kernels/MomentumEdgeSolverAlgSphere.h"
 #include "EquationSystem.h"
 #include "PecletFunction.h"
 #include "SolutionOptions.h"
@@ -20,7 +20,7 @@
 namespace sierra {
 namespace nalu {
 
-MomentumEdgeSolverAlg::MomentumEdgeSolverAlg(
+MomentumEdgeSolverAlgSphere::MomentumEdgeSolverAlgSphere(
   Realm& realm,
   stk::mesh::Part* part,
   EquationSystem* eqSystem
@@ -50,7 +50,7 @@ MomentumEdgeSolverAlg::MomentumEdgeSolverAlg(
 }
 
 void
-MomentumEdgeSolverAlg::execute()
+MomentumEdgeSolverAlgSphere::execute()
 {
   const double eps = 1.0e-16;
   const int ndim = realm_.meta_data().spatial_dimension();
@@ -207,28 +207,29 @@ MomentumEdgeSolverAlg::execute()
         for (int j=0; j < ndim; ++j)
           diff_flux += -viscIp * (duidxj[i][j] + duidxj[j][i]) * av[j];
 
-        const DblType total_flux = adv_flux + diff_flux;
+//        const DblType total_flux = adv_flux + diff_flux;
+        const DblType total_flux = diff_flux;
         smdata.rhs(rowL) -= total_flux;
         smdata.rhs(rowR) += total_flux;
 
-        // Left node contribution; upwind terms
-        DblType alhsfac = 0.5 * (mdot + stk::math::abs(mdot))
-          * pecfac * alphaUpw + 0.5 * alpha * om_pecfac * mdot;
-        smdata.lhs(rowL, rowL) += alhsfac / relaxFacU;
-        smdata.lhs(rowR, rowL) -= alhsfac;
-
-        // Right node contribution; upwind terms
-        alhsfac = 0.5 * (mdot - stk::math::abs(mdot))
-          * pecfac * alphaUpw + 0.5 * alpha * om_pecfac * mdot;
-        smdata.lhs(rowR, rowR) -= alhsfac / relaxFacU;
-        smdata.lhs(rowL, rowR) += alhsfac;
-
-        // central terms
-        alhsfac = 0.5 * mdot * (pecfac * om_alphaUpw + om_pecfac * om_alpha);
-        smdata.lhs(rowL, rowL) += alhsfac / relaxFacU;
-        smdata.lhs(rowL, rowR) += alhsfac;
-        smdata.lhs(rowR, rowL) -= alhsfac;
-        smdata.lhs(rowR, rowR) -= alhsfac / relaxFacU;
+//        // Left node contribution; upwind terms
+//        DblType alhsfac = 0.5 * (mdot + stk::math::abs(mdot))
+//          * pecfac * alphaUpw + 0.5 * alpha * om_pecfac * mdot;
+//        smdata.lhs(rowL, rowL) += alhsfac / relaxFacU;
+//        smdata.lhs(rowR, rowL) -= alhsfac;
+//
+//        // Right node contribution; upwind terms
+//        alhsfac = 0.5 * (mdot - stk::math::abs(mdot))
+//          * pecfac * alphaUpw + 0.5 * alpha * om_pecfac * mdot;
+//        smdata.lhs(rowR, rowR) -= alhsfac / relaxFacU;
+//        smdata.lhs(rowL, rowR) += alhsfac;
+//
+//        // central terms
+//        alhsfac = 0.5 * mdot * (pecfac * om_alphaUpw + om_pecfac * om_alpha);
+//        smdata.lhs(rowL, rowL) += alhsfac / relaxFacU;
+//        smdata.lhs(rowL, rowR) += alhsfac;
+//        smdata.lhs(rowR, rowL) -= alhsfac;
+//        smdata.lhs(rowR, rowR) -= alhsfac / relaxFacU;
 
         // Diffusion terms
         smdata.lhs(rowL, rowL) -= dlhsfac / relaxFacU;

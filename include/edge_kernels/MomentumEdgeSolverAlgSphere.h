@@ -8,8 +8,8 @@
 //
 
 
-#ifndef MOMENTUMEDGESOLVERALG_H
-#define MOMENTUMEDGESOLVERALG_H
+#ifndef MOMENTUMEDGESOLVERALGSPHERE_H
+#define MOMENTUMEDGESOLVERALGSPHERE_H
 
 #include "AssembleEdgeSolverAlgorithm.h"
 #include "PecletFunction.h"
@@ -17,15 +17,15 @@
 namespace sierra {
 namespace nalu {
 
-class MomentumEdgeSolverAlg : public AssembleEdgeSolverAlgorithm
+class MomentumEdgeSolverAlgSphere : public AssembleEdgeSolverAlgorithm
 {
 public:
-  MomentumEdgeSolverAlg(
+  MomentumEdgeSolverAlgSphere(
     Realm&,
     stk::mesh::Part*,
     EquationSystem*);
 
-  virtual ~MomentumEdgeSolverAlg() = default;
+  virtual ~MomentumEdgeSolverAlgSphere() = default;
 
   virtual void execute();
 
@@ -45,4 +45,4 @@ private:
 
 
 
-#endif /* MOMENTUMEDGESOLVERALG_H */
+#endif /* MOMENTUMEDGESOLVERALGSPHERE_H */

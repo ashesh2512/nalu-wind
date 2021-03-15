@@ -12,7 +12,7 @@
 #include "UnitTestUtils.h"
 #include "UnitTestHelperObjects.h"
 
-#include "edge_kernels/MomentumEdgeSolverAlg.h"
+#include "edge_kernels/MomentumEdgeSolverAlgSphere.h"
 
 namespace {
 namespace hex8_golds {
@@ -80,7 +80,7 @@ TEST_F(MomentumEdgeHex8Mesh, NGP_advection_diffusion)
 
   unit_test_utils::EdgeHelperObjects helperObjs(bulk_, stk::topology::HEX_8, 3);
 
-  helperObjs.create<sierra::nalu::MomentumEdgeSolverAlg>(partVec_[0]);
+  helperObjs.create<sierra::nalu::MomentumEdgeSolverAlgSphere>(partVec_[0]);
 
   helperObjs.execute();
 

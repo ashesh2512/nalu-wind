@@ -105,7 +105,8 @@
 // edge kernels
 #include <edge_kernels/ContinuityEdgeSolverAlg.h>
 #include <edge_kernels/ContinuityOpenEdgeKernel.h>
-#include <edge_kernels/MomentumEdgeSolverAlg.h>
+#include <edge_kernels/MomentumEdgeSolverAlgCube.h>
+#include <edge_kernels/MomentumEdgeSolverAlgSphere.h>
 #include <edge_kernels/MomentumOpenEdgeKernel.h>
 #include <edge_kernels/MomentumABLWallShearStressEdgeKernel.h>
 #include <edge_kernels/MomentumSymmetryEdgeKernel.h>
@@ -1218,6 +1219,7 @@ MomentumEquationSystem::register_interior_algorithm(
 {
   // types of algorithms
   const AlgorithmType algType = INTERIOR;
+  const AlgorithmType algType2 = INTERIOR2;
   const AlgorithmType algMass = SRC;
 
   // non-solver CFL alg
@@ -1244,10 +1246,21 @@ MomentumEquationSystem::register_interior_algorithm(
   if ( !realm_.solutionOptions_->useConsolidatedSolverAlg_ ) {
     std::map<AlgorithmType, SolverAlgorithm *>::iterator itsi
       = solverAlgDriver_->solverAlgMap_.find(algType);
-    if ( itsi == solverAlgDriver_->solverAlgMap_.end() ) {
-      SolverAlgorithm *theSolverAlg = NULL;
+    std::map<AlgorithmType, SolverAlgorithm *>::iterator itsi2
+          = solverAlgDriver_->solverAlgMap_.find(algType2);
+    if ( itsi == solverAlgDriver_->solverAlgMap_.end() || itsi2 == solverAlgDriver_->solverAlgMap_.end()) {
+      SolverAlgorithm *theSolverAlg  = NULL;
+      SolverAlgorithm *theSolverAlg2 = NULL;
       if ( realm_.realmUsesEdges_ ) {
-        theSolverAlg = new MomentumEdgeSolverAlg(realm_, part, this);
+        if ( part->name() == "sphere-hex" ) {
+          theSolverAlg = new MomentumEdgeSolverAlgSphere(realm_, part, this);
+        }
+        else if ( part->name() == "cube-hex" ) {
+          theSolverAlg2 = new MomentumEdgeSolverAlgCube(realm_, part, this);
+        }
+        else {
+          throw std::runtime_error("MomentumEquationSystem: Invalid part type: " + part->name());
+        }
         if (theTurbModel == SST_AMS) {
           SolverAlgorithm *theSolverSrcAlg = NULL;
           theSolverSrcAlg = new AssembleAMSEdgeKernelAlg(realm_, part, this);
@@ -1262,7 +1275,10 @@ MomentumEquationSystem::register_interior_algorithm(
       else {
         theSolverAlg = new AssembleMomentumElemSolverAlgorithm(realm_, part, this);
       }
-      solverAlgDriver_->solverAlgMap_[algType] = theSolverAlg;
+      if(theSolverAlg != NULL)
+        solverAlgDriver_->solverAlgMap_[algType] = theSolverAlg;
+      else if(theSolverAlg2 != NULL)
+        solverAlgDriver_->solverAlgMap_[algType2] = theSolverAlg2;
 
       // look for fully integrated source terms
       std::map<std::string, std::vector<std::string> >::iterator isrc
@@ -1323,7 +1339,10 @@ MomentumEquationSystem::register_interior_algorithm(
         }
       }
     } else {
-      itsi->second->partVec_.push_back(part);
+      if(itsi != solverAlgDriver_->solverAlgMap_.end())
+        itsi->second->partVec_.push_back(part);
+      else if(itsi2 != solverAlgDriver_->solverAlgMap_.end())
+        itsi2->second->partVec_.push_back(part);
 
       const bool hasAMS = realm_.realmUsesEdges_ && (theTurbModel == SST_AMS);
       if (hasAMS) {
